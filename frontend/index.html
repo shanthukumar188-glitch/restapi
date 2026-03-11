@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Advanced Bank System</title>
+  <style>
+    body { font-family: Arial; margin: 40px; }
+    input { margin: 5px; padding: 6px; width: 200px; }
+    button { padding: 6px 12px; margin: 5px; cursor: pointer; }
+    h2 { margin-top: 30px; }
+    pre { background: #f4f4f4; padding: 15px; border-radius: 5px; }
+    .section { border: 1px solid #ddd; padding: 15px; margin-bottom: 20px; border-radius: 5px; }
+  </style>
+</head>
+<body>
+
+<h1>🏦 Advanced Bank Management</h1>
+
+<div class="section">
+<h2>Create Customer</h2>
+<input id="name" placeholder="Name">
+<input id="email" placeholder="Email">
+<input id="phone" placeholder="Phone">
+<input id="password" type="password" placeholder="Password">
+<br>
+<button onclick="createCustomer()">Create Customer</button>
+</div>
+
+<div class="section">
+<h2>Create Account</h2>
+<input id="customer_id" placeholder="Customer ID">
+<input id="account_type" placeholder="Savings / Current">
+<input id="initial_balance" placeholder="Initial Balance">
+<br>
+<button onclick="createAccount()">Create Account</button>
+</div>
+
+<div class="section">
+<h2>Deposit</h2>
+<input id="deposit_acc" placeholder="Account Number">
+<input id="deposit_amount" placeholder="Amount">
+<br>
+<button onclick="deposit()">Deposit</button>
+</div>
+
+<div class="section">
+<h2>Withdraw</h2>
+<input id="withdraw_acc" placeholder="Account Number">
+<input id="withdraw_amount" placeholder="Amount">
+<br>
+<button onclick="withdraw()">Withdraw</button>
+</div>
+
+<div class="section">
+<h2>Get Account Balance</h2>
+<input id="fetch_acc" placeholder="Account Number">
+<button onclick="getAccount()">Get Balance</button>
+</div>
+
+<div class="section">
+<h2>Transaction History</h2>
+<input id="txn_acc" placeholder="Account Number">
+<button onclick="getTransactions()">View Transactions</button>
+</div>
+
+<h2>Response</h2>
+<pre id="output"></pre>
+
+<script>
+const API = "http://localhost:5000";
+
+function show(data) {
+  document.getElementById("output").textContent =
+    JSON.stringify(data, null, 2);
+}
+
+function createCustomer() {
+  fetch(API + "/customers", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+      name: document.getElementById("name").value,
+      email: document.getElementById("email").value,
+      phone: document.getElementById("phone").value,
+      password: document.getElementById("password").value
+    })
+  })
+  .then(res => res.json())
+  .then(data => show(data))
+  .catch(err => show({error: err.message}));
+}
+
+function createAccount() {
+  fetch(API + "/accounts", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+      customer_id: parseInt(document.getElementById("customer_id").value),
+      account_type: document.getElementById("account_type").value,
+      balance: parseFloat(document.getElementById("initial_balance").value)
+    })
+  })
+  .then(res => res.json())
+  .then(data => show(data))
+  .catch(err => show({error: err.message}));
+}
+
+function deposit() {
+  fetch(API + "/deposit", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+      account_number: document.getElementById("deposit_acc").value,
+      amount: parseFloat(document.getElementById("deposit_amount").value)
+    })
+  })
+  .then(res => res.json())
+  .then(data => show(data))
+  .catch(err => show({error: err.message}));
+}
+
+function withdraw() {
+  fetch(API + "/withdraw", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+      account_number: document.getElementById("withdraw_acc").value,
+      amount: parseFloat(document.getElementById("withdraw_amount").value)
+    })
+  })
+  .then(res => res.json())
+  .then(data => show(data))
+  .catch(err => show({error: err.message}));
+}
+
+function getAccount() {
+  const acc = document.getElementById("fetch_acc").value;
+  fetch(API + "/accounts/" + acc)
+    .then(res => res.json())
+    .then(data => show(data))
+    .catch(err => show({error: err.message}));
+}
+
+function getTransactions() {
+  const acc = document.getElementById("txn_acc").value;
+  fetch(API + "/transactions/" + acc)
+    .then(res => res.json())
+    .then(data => show(data))
+    .catch(err => show({error: err.message}));
+}
+</script>
+
+</body>
+</html>
